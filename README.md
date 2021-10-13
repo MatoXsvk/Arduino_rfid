@@ -3,7 +3,7 @@
 | Pôvodný kód je v zložke „Kod“
 
 ## Nastavenie editora:
-1. Na https://www.arduino.cc/en/software si stiahnite najnovšiu verziu editora Arduino IDE pre váš operačný systém.
+1. Na https://www.arduino.cc/en/software si stiahnite najnovšiu verziu editora Arduino IDE pre váš operačný systém. (Nie je potrebná žiadna donácia, stačí zakliknúť "Just download")
 2. Na https://github.com/MatoXsvk/Arduino_rfid stlačte zelene tlačidlo "Code" a dajte "Download ZIP".
 3. Po stiahnutí rozbaľte daný súbor
 4. Prejdite do zložky "Kod" a otvorte "Kod.ino"
