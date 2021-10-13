@@ -7,18 +7,40 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance.
 
 
 
-// Pre jednoduchšie pridavanie vacerých čipov dajte pred každý riadok čo má na konci //*|*// znak // a pre zrušenie ho zas
+/*
+    Pre jednoduchšie pridávanie viacerých čipov pred každý riadok, ktorý na konci obsahuje //|*|*|// dajte znak: //
+    príklad:  Serial.print("\nMessage : "); //|*|*|//  ->   //Serial.print("\nMessage : "); //|*|*|//
+    Pre zrušenie zase // z daných riadkov odstránte
 
-// 1. Získajte kópiu tohto kodu (github kopia - https://github.com/MatoXsvk/Arduino_rfid), dalej 'uid' kody, ktore chcete aby boli povolene (aj staré - spravte krok 2, potom po privedeni 5V na pin A0 vám to na okno vypíše staré uid kódy, ktoré môžete použiť)
-// 2. V ľavom hornom rohu otvorte lupu
-// 3. Priložte čip ktorý chcete pridať
-// 5. Skopírujte informáciu za vetou 'UID tag:' od prvého " do " do riadku kde ukazuje šípka pred } a dajte čiarku a medzeru :  String uids[] = {"B7 35 2E D6", ... , "novy uid", };
-// 6. Uložte a nahrajte šípkou vľavo hore
+
+     Vkladanie nových čipov:
+      1. Získajte kópiu tohto kódu (GitHub kopia - https://github.com/MatoXsvk/Arduino_rfid), ďalej 'UID' kódy, ktoré chcete aby boli povolené (aj staré - spravte krok 2, potom po privedení 5V na pin A0 vám to na okno vypíše staré uid kódy, ktoré môžete použiť)
+      2. Pripojte dosku arduino k počítaču pomocou kábla USB-B
+      3. Otvorte kópiu kódu v editore alebo vytvorte novy projekt v arduino editore (vytvorenie projektu: tlačidlo v hornej lište s dokumentom)
+      4. Na hormnom paneli rozkliknite "Nástroje" a za "Dosku" zadajte "Arduino UNO", a v "Port" vyberte možnosť, za ktorou je (Arduino UNO)
+      5. Ak je zapajané prvý krát(ak nie sú priložene knižnice), na paneli rozkliknite "Projekt" > "Zahrnúť knižnice" > "Pridať .zip knižnicu" a vyberte .zip súbor priložený k projektu (rfid-master.zip)
+      6. Na arduino doske vypojte kábel z 8. pinu!
+      7. V ľavom hornom rohu editora Arduino stlačte tlačidlo lupy
+      8. Čip, ktorý chcete pridať, priložte k čítačke
+      9. Skopírujte informáciu za vetou 'UID tag:' medzi úvodzovkami a vložte ju za ostatné kódy vo forme "XX XX XX XX" a oddeľujte ich čiarkou. Ak doposiaľ nie je uložený žiadny kód, tak ju vložte medzi kučeravé zátvorky: {}
+      11. Uložte, nahrajte kód tlačidlom s šípkou vľavo hore v editore arduino.
+      12. Znovu zapojte 8. pin
+
+*/
 
 // |
 // V
-String uids[] = {};
-
+String uids[] = {
+  "B7 35 2E D6", "89 A2 1D 1F", "9C A1 99 2F", "C7 EE 2C D6", "2C 63 9A 2F",
+  "27 EB CF D6", "C7 DD C8 D6", "BC C8 B1 2F", "FC E1 AF 2F", "D7 E7 C7 D6",
+  "8C B3 B9 2F", "57 69 32 D6", "17 42 CC D6", "97 BC C7 D6", "F7 0E 36 D7",
+  "47 69 66 D6", "C7 D7 4E D7", "A7 E7 CF D6", "DC F5 FF 30", "57 8A CE D6",
+  "B7 7F C4 D6", "E7 5A D4 D6", "3C C2 0D 2F", "57 D6 C6 D6", "47 BD CF D6",
+  "37 29 60 D7", "47 2E D3 D6", "4C 6D FD 30", "47 98 64 D6", "6C 5F B2 2F",
+  "C7 1B D5 D6", "2C 28 AE 2F", "67 AA 34 D6", "3C 48 F7 30", "27 A4 3B D6",
+  "EC 27 AE 2F", "C7 85 44 D6", "D7 62 CD D6", "67 DF C9 D6", "F7 14 CA D6",
+  "37 E2 35 D6",
+};
 
 
 
@@ -26,18 +48,27 @@ String uids[] = {};
 
 
 int rele = 2;
-int bzuciak = 3;
+int beeper = 3;
 int ledSpravne = 4;
 int ledZle = 5;
 
+int resetPin = 8;
+
 int codesBTN = A0;
+
+
+int refreshArduinoTime = 30;
+
+
 
 void setup()
 {
+  digitalWrite(resetPin, HIGH);
+  pinMode(resetPin, OUTPUT);
   pinMode(rele, OUTPUT);
   pinMode(ledSpravne, OUTPUT);
   pinMode(ledZle, OUTPUT);
-  pinMode(bzuciak, OUTPUT);
+  pinMode(beeper, OUTPUT);
 
   pinMode(codesBTN, INPUT);
 
@@ -47,16 +78,16 @@ void setup()
   Serial.println("Approximate your card to the reader...");
   Serial.println();
 
+  signalizaciaZapnutia();
 }
+
 void loop()
 {
+  if (millis() > refreshArduinoTime * 60000) restartArduino();
   if (digitalRead(codesBTN) == HIGH) printUIDS();
 
   // Look for new cards and select one of the cards
-  if ( ! mfrc522.PICC_IsNewCardPresent() || ! mfrc522.PICC_ReadCardSerial())
-  {
-    return;
-  }
+  if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial()) return;
 
   //Show UID on serial monitor
   Serial.print("UID tag : "); //*|*//
@@ -83,7 +114,8 @@ void loop()
     Serial.println(); //*|*//
 
     signalizacia(true);
-    otvoritStroj();
+    otvoritStroj(1000);
+    return;
   }
   else
   {
@@ -93,7 +125,18 @@ void loop()
     digitalWrite(rele, LOW);
     signalizacia(false);
   }
-  delay(3000);
+  delay(100);
+}
+
+void beep(int len, int d1, int d2) {
+  for (int i = 0; i < len; i++)
+  {
+    digitalWrite(beeper, HIGH);
+    delay(d1);
+
+    digitalWrite(beeper, LOW);
+    delay(d2);
+  }
 }
 
 bool isInAuthorized(String value)
@@ -116,10 +159,10 @@ void signalizacia(bool overenie)
       int timeDuration = 25;
       if (i == 1)timeDuration = 45;
       for (int j = 0; j < timeDuration; j++) {
-        digitalWrite(bzuciak, HIGH);
+        digitalWrite(beeper, HIGH);
         delay(i);
 
-        digitalWrite(bzuciak, LOW);
+        digitalWrite(beeper, LOW);
         delay(1);
       }
       delay(25);
@@ -132,29 +175,92 @@ void signalizacia(bool overenie)
   digitalWrite(ledZle, HIGH);
   for (int i = 0; i < 50; i++)
   {
-    digitalWrite(bzuciak, HIGH);
+    digitalWrite(beeper, HIGH);
     delay(1);
 
-    digitalWrite(bzuciak, LOW);
+    digitalWrite(beeper, LOW);
     delay(1);
   }
   delay(50);
   for (int i = 0; i < 100; i++)
   {
-    digitalWrite(bzuciak, HIGH);
+    digitalWrite(beeper, HIGH);
     delay(3);
 
-    digitalWrite(bzuciak, LOW);
+    digitalWrite(beeper, LOW);
     delay(1);
   }
   digitalWrite(ledZle, LOW);
 
 }
 
-void otvoritStroj()
+void signalizaciaZapnutia()
+{
+  delay(500);
+  for (int i = 0; i < 50; i++)
+  {
+    digitalWrite(beeper, HIGH);
+    delay(3);
+
+    digitalWrite(beeper, LOW);
+    delay(3);
+  }
+  delay(50);
+  for (int i = 0; i < 50; i++)
+  {
+    digitalWrite(beeper, HIGH);
+    delay(1);
+
+    digitalWrite(beeper, LOW);
+    delay(1);
+  }
+  delay(50);
+}
+
+void signalizaciaRestartu()
+{
+  for (int i = 0; i < 50; i++)
+  {
+    digitalWrite(beeper, HIGH);
+    delay(4);
+
+    digitalWrite(beeper, LOW);
+    delay(4);
+  }
+  delay(50);
+  for (int i = 0; i < 50; i++)
+  {
+    digitalWrite(beeper, HIGH);
+    delay(2);
+
+    digitalWrite(beeper, LOW);
+    delay(2);
+  }
+  delay(50);
+  for (int i = 0; i < 50; i++)
+  {
+    digitalWrite(beeper, HIGH);
+    delay(3);
+
+    digitalWrite(beeper, LOW);
+    delay(3);
+  }
+  delay(50);
+  for (int i = 0; i < 50; i++)
+  {
+    digitalWrite(beeper, HIGH);
+    delay(1);
+
+    digitalWrite(beeper, LOW);
+    delay(1);
+  }
+  delay(50);
+}
+
+void otvoritStroj(int timeOpened)
 {
   digitalWrite(rele, HIGH);
-  delay(500);
+  delay(timeOpened);
   digitalWrite(rele, LOW);
 }
 
@@ -170,4 +276,9 @@ void printUIDS()
   }
   Serial.println("\n");
   delay(2000);
+}
+
+void restartArduino() {
+  signalizaciaRestartu();
+  digitalWrite(resetPin, LOW);
 }
