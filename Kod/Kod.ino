@@ -21,8 +21,9 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance.
       5. Ak je zapajané prvý krát(ak nie sú priložene knižnice), na paneli rozkliknite "Projekt" > "Zahrnúť knižnice" > "Pridať .zip knižnicu" a vyberte .zip súbor priložený k projektu (rfid-master.zip)
       6. Na arduino doske vypojte kábel z 8. pinu!
       7. V ľavom hornom rohu editora Arduino stlačte tlačidlo lupy
-      8. Čip, ktorý chcete pridať, priložte k čítačke
-      9. Skopírujte informáciu za vetou 'UID tag:' medzi úvodzovkami a vložte ju za ostatné kódy vo forme "XX XX XX XX" a oddeľujte ich čiarkou. Ak doposiaľ nie je uložený žiadny kód, tak ju vložte medzi kučeravé zátvorky: {}
+      8. Stlačte tlačidlo šípky aby sa kod nahral na dosku Arduino
+      9. Čip, ktorý chcete pridať, priložte k čítačke
+      10. Skopírujte informáciu za vetou 'UID tag:' medzi úvodzovkami a vložte ju za ostatné kódy vo forme "XX XX XX XX" a oddeľujte ich čiarkou. Ak doposiaľ nie je uložený žiadny kód, tak ju vložte medzi kučeravé zátvorky: {}
       11. Uložte, nahrajte kód tlačidlom s šípkou vľavo hore v editore arduino.
       12. Znovu zapojte 8. pin
 
