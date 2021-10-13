@@ -1,8 +1,8 @@
 # Arduino_rfid
 
-Pôvodný kód je v zlozke kod
+| Pôvodný kód je v zložke „Kod“
 
-Nastavenie editora:
+## Nastavenie editora:
 1. Na https://www.arduino.cc/en/software si stiahnite najnovšiu verziu editora Arduino IDE pre váš operačný systém.
 2. Na https://github.com/MatoXsvk/Arduino_rfid stlačte zelene tlačidlo "Code" a dajte "Download ZIP".
 3. Po stiahnutí rozbaľte daný súbor
@@ -12,7 +12,7 @@ Nastavenie editora:
 7. Po pripojení dosky arduino, rozkliknite na paneli " Nástroje " > "Port" a vyberte možnosť, za ktorou je (Arduino UNO) (pripadne jednu z možností)
 
 
-Nahrávanie programu:
+## Nahrávanie programu:
 1. Pripojte dosku arduino k počítaču pomocou kábla USB-B
 2. Na arduino doske vypojte kábel z 8. pinu!
 3. V ľavom hornom rohu editora Arduino stlačte tlačidlo lupy
